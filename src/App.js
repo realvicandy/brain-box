@@ -24,18 +24,18 @@ class App extends Component {
   }
 
 onInputChange = (event) => {
-  console.log(event.target.value);
+  this.setState({input: event.target.value});
 }
 
 onButtonSubmit = () => {
-  console.log('click');
+  this.setState({imageUrl: this.state.input});
   // *****Integrating Clarifai API*****
   const USER_ID = 'realvicandy';
   const PAT = '33c27a0a3f2547f789bc36bbdec57dcc';
   const APP_ID = 'my-first-application';
-  const MODEL_ID = 'color-recognition';
-  const MODEL_VERSION_ID = 'dd9458324b4b45c2be1a7ba84d27cd04';    
-  const IMAGE_URL = 'https://samples.clarifai.com/metro-north.jpg';
+  const MODEL_ID = 'face-detection';
+  const MODEL_VERSION_ID = '45fb9a671625463fa646c3523a3087d5';    
+  const IMAGE_URL = this.state.input;
 
   const raw = JSON.stringify({
       "user_app_id": {
@@ -66,9 +66,9 @@ onButtonSubmit = () => {
   // https://api.clarifai.com/v2/models/{YOUR_MODEL_ID}/outputs
   // this will default to the latest version_id
 
-  fetch("https://api.clarifai.com/v2/models/" + 'color-recognition' + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
+  fetch("https://api.clarifai.com/v2/models/" + 'face-detection' + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
       .then(response => response.json())
-      .then(result => console.log(result))
+      .then(result => console.log(result.outputs[0].data.regions[0].region_info.bounding_box))
       .catch(error => console.log('error', error));
   // *****Integrating Clarifai API*****
 
@@ -89,13 +89,13 @@ onButtonSubmit = () => {
       <div className="App">
         <> {/*particles-bg NPM package*/}
           <div>...</div>
-          <ParticlesBg type="cobweb" num={250} bg={true} />
+          <ParticlesBg type="cobweb" num={200} bg={true} />
         </> {/*particles-bg NPM package*/}
         <Navigation />
         <Logo />
         <Rank />
         <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
-        <FaceRecognition /> 
+        <FaceRecognition imageUrl={this.state.imageUrl} /> 
       </div>
     );
   }
