@@ -19,12 +19,31 @@ class App extends Component {
     super();
     this.state = {
       input: '',
-      imageUrl: ''
+      imageUrl: '',
+      box: {}
     }
   }
 
 onInputChange = (event) => {
   this.setState({input: event.target.value});
+}
+
+calculateFaceLocation = (data) => {
+  const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
+  const image = document.getElementById('inputimage');
+  const width = Number(image.width);
+  const height = Number(image.height);
+  return {
+    leftCol: clarifaiFace.left_col * width,
+    topRow: clarifaiFace.top_row * height,
+    rightCol: width - (clarifaiFace.right_col * width),
+    bottomRow: height - (clarifaiFace.bottom_row * height)
+  }
+}
+
+displayFaceBox = (box) => {
+  this.setState({box: box});
+  console.log(box);
 }
 
 onButtonSubmit = () => {
@@ -68,7 +87,7 @@ onButtonSubmit = () => {
 
   fetch("https://api.clarifai.com/v2/models/" + 'face-detection' + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
       .then(response => response.json())
-      .then(result => console.log(result.outputs[0].data.regions[0].region_info.bounding_box))
+      .then(result => this.displayFaceBox(this.calculateFaceLocation(result)))
       .catch(error => console.log('error', error));
   // *****Integrating Clarifai API*****
 
@@ -89,13 +108,17 @@ onButtonSubmit = () => {
       <div className="App">
         <> {/*particles-bg NPM package*/}
           <div>...</div>
-          <ParticlesBg type="cobweb" num={200} bg={true} />
+          <ParticlesBg type="cobweb" num={75} bg={true} />
         </> {/*particles-bg NPM package*/}
         <Navigation />
         <Logo />
         <Rank />
-        <ImageLinkForm onInputChange={this.onInputChange} onButtonSubmit={this.onButtonSubmit} />
-        <FaceRecognition imageUrl={this.state.imageUrl} /> 
+        <ImageLinkForm
+          onInputChange={this.onInputChange}
+          onButtonSubmit={this.onButtonSubmit}
+        />
+        <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}
+        /> 
       </div>
     );
   }
