@@ -2,6 +2,7 @@ import {Component} from 'react';
 import ParticlesBg from 'particles-bg'
 import Clarifai from 'clarifai';
 import Navigation from "./components/Navigation/Navigation";
+import SignIn from './components/SignIn/SignIn';
 import Logo from "./components/Logo/Logo";
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
@@ -111,6 +112,7 @@ onButtonSubmit = () => {
           <ParticlesBg type="cobweb" num={75} bg={true} />
         </> {/*particles-bg NPM package*/}
         <Navigation />
+        <SignIn />
         <Logo />
         <Rank />
         <ImageLinkForm
