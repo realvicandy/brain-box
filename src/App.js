@@ -21,7 +21,8 @@ class App extends Component {
     this.state = {
       input: '',
       imageUrl: '',
-      box: {}
+      box: {},
+      route: 'SignIn'
     }
   }
 
@@ -104,23 +105,30 @@ onButtonSubmit = () => {
   // *****Andrei Code*****
 }
 
+onRouteChange = (route) => {
+  this.setState({route: route});
+}
+
   render() {
     return (
       <div className="App">
         <> {/*particles-bg NPM package*/}
           <div>...</div>
-          <ParticlesBg type="cobweb" num={75} bg={true} />
+          <ParticlesBg type="cobweb" num={100} bg={true} />
         </> {/*particles-bg NPM package*/}
-        <Navigation />
-        <SignIn />
-        <Logo />
-        <Rank />
-        <ImageLinkForm
-          onInputChange={this.onInputChange}
-          onButtonSubmit={this.onButtonSubmit}
-        />
-        <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl}
-        /> 
+        <Navigation onRouteChange={this.onRouteChange} />
+        { this.state.route === 'SignIn'
+          ? <SignIn onRouteChange={this.onRouteChange} />
+          : <div>
+              <Logo />
+              <Rank />
+              <ImageLinkForm
+                onInputChange={this.onInputChange}
+                onButtonSubmit={this.onButtonSubmit}
+              />
+              <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
+            </div>
+        } 
       </div>
     );
   }
