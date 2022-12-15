@@ -3,6 +3,7 @@ import ParticlesBg from 'particles-bg'
 import Clarifai from 'clarifai';
 import Navigation from "./components/Navigation/Navigation";
 import SignIn from './components/SignIn/SignIn';
+import Register from './components/Register/Register';
 import Logo from "./components/Logo/Logo";
 import ImageLinkForm from './components/ImageLinkForm/ImageLinkForm';
 import Rank from './components/Rank/Rank';
@@ -22,7 +23,7 @@ class App extends Component {
       input: '',
       imageUrl: '',
       box: {},
-      route: 'SignIn'
+      route: 'SignIn',
     }
   }
 
@@ -117,9 +118,8 @@ onRouteChange = (route) => {
           <ParticlesBg type="cobweb" num={100} bg={true} />
         </> {/*particles-bg NPM package*/}
         <Navigation onRouteChange={this.onRouteChange} />
-        { this.state.route === 'SignIn'
-          ? <SignIn onRouteChange={this.onRouteChange} />
-          : <div>
+        { this.state.route === 'home'
+          ? <div>
               <Logo />
               <Rank />
               <ImageLinkForm
@@ -128,6 +128,11 @@ onRouteChange = (route) => {
               />
               <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
             </div>
+          : (
+             this.state.route === 'SignIn' 
+             ? <SignIn onRouteChange={this.onRouteChange} />
+             : <Register onRouteChange={this.onRouteChange} />
+            )
         } 
       </div>
     );
