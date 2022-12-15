@@ -24,11 +24,21 @@ class App extends Component {
       imageUrl: '',
       box: {},
       route: 'SignIn',
+      isSignedIn: false
     }
   }
 
 onInputChange = (event) => {
   this.setState({input: event.target.value});
+}
+
+onRouteChange = (route) => {
+  if (route === 'SignIn') {
+    this.setState({isSignedIn: false})
+  } else if (route === 'home') {
+    this.setState({isSignedIn: true})
+  }
+  this.setState({route: route});
 }
 
 calculateFaceLocation = (data) => {
@@ -46,7 +56,6 @@ calculateFaceLocation = (data) => {
 
 displayFaceBox = (box) => {
   this.setState({box: box});
-  console.log(box);
 }
 
 onButtonSubmit = () => {
@@ -106,19 +115,16 @@ onButtonSubmit = () => {
   // *****Andrei Code*****
 }
 
-onRouteChange = (route) => {
-  this.setState({route: route});
-}
-
   render() {
+    const { imageUrl, box, route, isSignedIn } = this.state;
     return (
       <div className="App">
         <> {/*particles-bg NPM package*/}
           <div>...</div>
           <ParticlesBg type="cobweb" num={100} bg={true} />
         </> {/*particles-bg NPM package*/}
-        <Navigation onRouteChange={this.onRouteChange} />
-        { this.state.route === 'home'
+        <Navigation isSignedIn={isSignedIn} onRouteChange={this.onRouteChange} />
+        { route === 'home'
           ? <div>
               <Logo />
               <Rank />
@@ -126,10 +132,10 @@ onRouteChange = (route) => {
                 onInputChange={this.onInputChange}
                 onButtonSubmit={this.onButtonSubmit}
               />
-              <FaceRecognition box={this.state.box} imageUrl={this.state.imageUrl} />
+              <FaceRecognition box={box} imageUrl={imageUrl} />
             </div>
           : (
-             this.state.route === 'SignIn' 
+             route === 'SignIn' 
              ? <SignIn onRouteChange={this.onRouteChange} />
              : <Register onRouteChange={this.onRouteChange} />
             )
