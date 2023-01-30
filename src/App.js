@@ -1,6 +1,5 @@
 import {Component} from 'react';
 import ParticlesBg from 'particles-bg'
-import Clarifai from 'clarifai';
 import Navigation from "./components/Navigation/Navigation";
 import SignIn from './components/SignIn/SignIn';
 import Register from './components/Register/Register';
@@ -10,16 +9,7 @@ import Rank from './components/Rank/Rank';
 import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import './App.css';
 
-// *****Initializing Clarifai API*****
-const app = new Clarifai.App({
- apiKey: '5606a5b884484899a1a4b28c96834f08'
-});
-// *****Initializing Clarifai API*****
-
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
+const initialState = {
       input: '',
       imageUrl: '',
       box: {},
@@ -33,6 +23,11 @@ class App extends Component {
         joined: ''
       }
     }
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = initialState;
   }
 
 loadUser = (data) => {
@@ -51,7 +46,7 @@ onInputChange = (event) => {
 
 onRouteChange = (route) => {
   if (route === 'SignIn') {
-    this.setState({isSignedIn: false})
+    this.setState(initialState)
   } else if (route === 'home') {
     this.setState({isSignedIn: true})
   }
@@ -75,36 +70,6 @@ displayFaceBox = (box) => {
   this.setState({box: box});
 }
 
-// onImageSubmit = () => {
-//     this.setState({imageUrl: this.state.input});
-//       fetch('http://localhost:3000/imageurl', {
-//         method: 'post',
-//         headers: {'Content-Type': 'application/json'},
-//         body: JSON.stringify({
-//           input: this.state.input
-//         })
-//       })
-//       .then(response => response.json())
-//       .then(response => {
-//         if (response) {
-//           fetch('http://localhost:3000/image', {
-//             method: 'put',
-//             headers: {'Content-Type': 'application/json'},
-//             body: JSON.stringify({
-//               id: this.state.user.id
-//             })
-//           })
-//             .then(response => response.json())
-//             .then(count => {
-//               this.setState({user: { entries: count}})
-//             })
-//             .catch(console.log)
-//         }
-//         this.displayFaceBox(this.calculateFaceLocation(response))
-//       })
-//       .catch(err => console.log(err));
-// }
-
 onImageSubmit = () => {
   this.setState({imageUrl: this.state.input});
   // *****Integrating Clarifai API*****
@@ -112,7 +77,7 @@ onImageSubmit = () => {
   const PAT = '33c27a0a3f2547f789bc36bbdec57dcc';
   const APP_ID = 'my-first-application';
   const MODEL_ID = 'face-detection';
-  const MODEL_VERSION_ID = '45fb9a671625463fa646c3523a3087d5';    
+  const MODEL_VERSION_ID = '45fb9a671625463fa646c3523a3087d5';
   const IMAGE_URL = this.state.input;
 
   const raw = JSON.stringify({
@@ -140,12 +105,12 @@ onImageSubmit = () => {
       body: raw
   };
 
-  fetch("https://api.clarifai.com/v2/models/" + 'face-detection' + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
+  fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
       .then(response => response.json())
       .then(result => {
         if (result) {
           fetch('http://localhost:3000/image', {
-            method: 'put',
+            method: 'PUT',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
               id: this.state.user.id
@@ -155,6 +120,7 @@ onImageSubmit = () => {
           .then(count => {
             this.setState(Object.assign(this.state.user, {entries: count}))
           })
+          .catch(console.log);
         }
         this.displayFaceBox(this.calculateFaceLocation(result))
       })
