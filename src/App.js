@@ -53,6 +53,7 @@ onRouteChange = (route) => {
   this.setState({route: route});
 }
 
+/***** MATH FOR THE FACE BOX *****/
 calculateFaceLocation = (data) => {
   const clarifaiFace = data.outputs[0].data.regions[0].region_info.bounding_box;
   const image = document.getElementById('inputimage');
@@ -65,68 +66,44 @@ calculateFaceLocation = (data) => {
     bottomRow: height - (clarifaiFace.bottom_row * height)
   }
 }
+/***** MATH FOR THE FACE BOX *****/
 
 displayFaceBox = (box) => {
   this.setState({box: box});
 }
 
+/***** FETCH IMG, INCREMENT ENTRY COUNT, DISPLAY FACE BOX *****/
 onImageSubmit = () => {
-  this.setState({imageUrl: this.state.input});
-  // *****Integrating Clarifai API*****
-  const USER_ID = 'realvicandy';
-  const PAT = '33c27a0a3f2547f789bc36bbdec57dcc';
-  const APP_ID = 'my-first-application';
-  const MODEL_ID = 'face-detection';
-  const MODEL_VERSION_ID = '45fb9a671625463fa646c3523a3087d5';
-  const IMAGE_URL = this.state.input;
-
-  const raw = JSON.stringify({
-      "user_app_id": {
-          "user_id": USER_ID,
-          "app_id": APP_ID
-      },
-      "inputs": [
-          {
-              "data": {
-                  "image": {
-                      "url": IMAGE_URL
-                  }
-              }
-          }
-      ]
-  });
-
-  const requestOptions = {
-      method: 'POST',
-      headers: {
-          'Accept': 'application/json',
-          'Authorization': 'Key ' + PAT
-      },
-      body: raw
-  };
-
-  fetch("https://api.clarifai.com/v2/models/" + MODEL_ID + "/versions/" + MODEL_VERSION_ID + "/outputs", requestOptions)
-      .then(response => response.json())
-      .then(result => {
-        if (result) {
+    this.setState({imageUrl: this.state.input});
+      fetch('http://localhost:3000/imageurl', {
+        method: 'post',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          input: this.state.input
+        })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res) {
           fetch('http://localhost:3000/image', {
-            method: 'PUT',
+            method: 'put',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
               id: this.state.user.id
             })
           })
-          .then(res => res.json())
-          .then(count => {
-            this.setState(Object.assign(this.state.user, {entries: count}))
-          })
-          .catch(console.log);
+            .then(res => res.json())
+            .then(count => {
+              this.setState(Object.assign(this.state.user, { entries: count}))
+            })
+            .catch(console.log)
+
         }
-        this.displayFaceBox(this.calculateFaceLocation(result))
+        this.displayFaceBox(this.calculateFaceLocation(res))
       })
-      .catch(error => console.log('error', error));
-  // *****Integrating Clarifai API*****
-}
+      .catch(err => console.log(err));
+  }
+  /***** FETCH IMG, INCREMENT ENTRY COUNT, DISPLAY FACE BOX *****/
 
   render() {
     const { imageUrl, box, route, isSignedIn } = this.state;
